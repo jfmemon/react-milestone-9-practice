@@ -1,23 +1,48 @@
-import logo from './logo.svg';
 import './App.css';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import Main from './Layout/Main';
+import Home from './Components/Home/Home';
+import About from './Components/About/About';
+import CountryDetails from './Components/CountryDetails/CountryDetails';
+import LoadChartData from './Components/LoadChartData/LoadChartData';
 
 function App() {
+  const router = createBrowserRouter([
+    {
+      path: '/',
+      element: <Main></Main>,
+      children: [
+        {
+          path: '/',
+          loader: async() => {
+            return fetch('https://restcountries.com/v3.1/all')
+          },
+          element: <Home></Home> 
+        },
+        {
+          path: '/about',
+          element: <About></About>
+        },
+        {
+          path: '/details/:countryName',
+          loader: async ({params}) => {
+            return fetch(`https://restcountries.com/v3.1/name/${params.countryName}`)
+          },
+          element: <CountryDetails></CountryDetails>,
+        },
+        {
+          path: '/chart',
+          loader: async () => {
+            return fetch('https://restcountries.com/v3.1/all')
+          },
+          element: <LoadChartData></LoadChartData>
+        }
+      ]
+    }
+  ]);
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <RouterProvider router={router}></RouterProvider>
     </div>
   );
 }
